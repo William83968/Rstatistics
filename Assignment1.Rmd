@@ -1,0 +1,162 @@
+---
+title: "SydneyEnergyResearch"
+subtitle: "Electricity"
+author: "© University of Sydney 2023"
+date: 30/03/2023
+
+output:
+  html_document:
+    fig_caption: yes
+    number_sections: yes
+    self_contained: yes
+    theme: flatly
+    css: 
+      - https://use.fontawesome.com/releases/v5.0.6/css/all.css
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r include=FALSE}
+library(readxl)
+data2019 <- read_excel("data/Ausgrid average electricity consumption by LGA 201819.xlsx", range = "A1:Q40")
+data2020 <- read_excel("data/Ausgrid average electricity consumption by LGA 2020.xlsx", range = "A2:Q43")
+data2023 <- read_excel("data/Ausgrid average electricity consumption by LGA 202223 excel.xlsx", range = "A2:Q43")
+```
+Taking a quick view of the data
+```{r eval=TRUE}
+# For the 2019 data set
+dim(data2019)
+head(data2019, 10)
+# For the 2020 data set
+dim(data2020)
+head(data2020, 10)
+# For the 2023 data set
+dim(data2023)
+head(data2023, 10)
+```
+## Data source verification
+This data source is from Ausgrid, which is a large electricity provider that has more than 1.7 million customers in Sydney, Australia.Although this is a electricty provider that is run by a company, however, it must be subjected to a range of regulations and guidelines to ensure the accuracy of their data, including the Australian Energy Regulator(AER), according to the Australian energy policies.
+
+Some useful functions
+```{r}
+wrap.it <- function(x, len)
+{ 
+  sapply(x, function(y) paste(strwrap(y, len), 
+                              collapse = "\n"), 
+         USE.NAMES = FALSE)
+}
+
+wrap.labels <- function(x, len)
+{
+  if (is.list(x))
+  {
+    lapply(x, wrap.it, len)
+  } else {
+    wrap.it(x, len)
+  }
+}
+```
+## IDA
+To get an idea of the new data, we will do a quick bargraph of the 'general supply' columns from the excel file.
+(It is with several trial and error, that we have found out the original excel file is not suitable for R data analysis, therefore manual excel operation was done to extract it out into a form which was useful.)
+```{r eval=TRUE}
+library(readxl)
+library(dplyr)
+options(scipen = 999)
+
+# Read in files
+extracted_data <- read_excel("data/Electricity_consumption(extracted).xlsx")
+extracted_data <- arrange(extracted_data)
+
+# Setting up the output graph
+par(mar = c(5, 8, 0, 2), mgp = c(4, 1, 0))
+
+# The 2019 Dataset
+values2019 <- extracted_data$`2019-R`
+suburbs2019 <- extracted_data$H2019
+barplot(values2019, names.arg=wrap.labels(rev(suburbs2019), 20), 
+        col="red", xlab=" Electricity consumption/MWh", horiz=T, las=2, cex.names = 0.7)
+
+# The 2020 Dataset
+values2020 <- extracted_data$`2020-R`
+suburbs2020 <- extracted_data$H2020
+barplot(values2020, names.arg=wrap.labels(rev(suburbs2020), 20), 
+        col="green", xlab=" Electricity consumption/MWh", horiz=T, las=2, cex.names = 0.7)
+
+# The 2021 Dataset
+values2021 <- extracted_data$`2021-R`
+suburbs2021 <- extracted_data$H2021
+barplot(values2021, names.arg=wrap.labels(rev(suburbs2021), 20), 
+        col="blue", xlab=" Electricity consumption/MWh", horiz=T, las=2, cex.names = 0.7)
+```
+
+## Research question 1:
+The impact of the covid-19 pandemic on electricity consumption in the different suburbs of Sydney
+As covid-19 strikes Australia, our reliance on digital equipments especially remote streaming apps has increased drastically.So, the hypothesis is the usage of digital equipments has led to a increase in electricity consumption.
+Is there an electricity usage rise during the pandemic?
+
+From the IDA, it seems like the data itself is not distinctive enough to be able figure out the difference from first site.
+
+```{r eval=TRUE}
+sdev1 = mean(values2019)
+sdev2 = mean(values2020)
+sdev3 = mean(values2021)
+ts = c(sdev1, sdev2, sdev3)
+barplot(ts, names.arg=c('2019', '2020', '2021'))
+```
+It seems like the hypothesis has been falsified, there was a slight electric usage increase, but not during pandemic, instead it was after the pandemic in 2021
+However, it is also considered that as some values from the 2022-2023 dataset is missing, part of this could also contributed to this phenomenon.
+
+## Research question 2:
+As there was a lot of changes to the distribution of population before and after the pandemic, the impact of the change was investigated.
+To get an general idea of which areas had the highest amount of electricity consumption, normal distribution graph was made.
+(We'll use the latest complete dataset, which was the 2021 dataset)
+General Supply
+```{r eval=TRUE}
+distribution <- function(title, name, values){
+  df <- data.frame(label=name, value=values)
+  df_sorted <- df[order(df$value, decreasing = FALSE),]
+  mean_val <- mean(values)
+  sd_val <- sd(values)
+  par(mar = c(5, 6, 2, 2), mgp = c(4, 1, 0), fig = c(0, 1, 0, 1), fin = c(6, 4))
+  barplot(df_sorted$value, names.arg=wrap.labels(df_sorted$label, 20), 
+        col="blue", xlab=title, horiz=T, las=2, cex.names = 0.4, , cex.lab=0.7, cex.axis=0.7)
+  hist(values, breaks=10, freq=FALSE, col="grey", xlab="Values", main="Normal Distribution")
+  curve(dnorm(x, mean=mean_val, sd=sd_val), add=TRUE, col="blue")
+  abline(v = mean_val, col = "red", lwd = 2)
+}
+distribution("Electricity Consumption/MWh", suburbs2021, values2021)
+```
+'Non-residential small-medium sites'
+```{r eval=TRUE}
+values2021M <- extracted_data$`2021-M`
+distribution("Electricity Consumption/MWh",suburbs2021, values2021M)
+```
+'Non-residential large sites'
+```{r eval=TRUE}
+values2021L <- extracted_data$`2021-L`
+distribution("Electricity Consumption/MWh",suburbs2021, values2021L)
+```
+Finally, to make a conclusion, a pie chart is made
+```{r eval=TRUE}
+par(mar = c(5, 6, 2, 2), mgp = c(4, 1, 0), fig = c(0, 1, 0, 1), fin = c(6, 4))
+sum_2021G <- sum(values2021)
+sum_2021M <- sum(values2021M)
+sum_2021L <- sum(values2021L)
+pie_values <- c(sum_2021G, sum_2021M, sum_2021L)
+pie_labels <- c("General Supply", "Medium Sites", "Large Sites")
+pie(pie_values, labels = pie_labels)
+```
+As can see, this shows a nuanced side of the distribution of electricity consumption by Ausgrid, as Ausgrid is the largest distributor of electricity on the east coast, there's a high chance that this represents the total electricity consumption of NSW.
+If we're talking about large areas like shopping malls, business skyscrapers or tourist attractions, than population does matter, in fact a lot, so places where there tends to be large flow of population, like Sydney(The normal distribution graph shows how skewed this situation is), actually uses the most amount electrcity.
+However, if we're talking about residential supplies, which corresponds to the 'General Supply' column of the data source.Than population matters less, because with residential usage, the amount of electricty consumption depends on the size of the housing, which is why I guess Central Coast has the most amount of electricty
+(Note: Again, just to be cautious, it is considered that Ausgrid could've have a target customer base, which could explain part of this situation as well)
+
+## References
+@misc{jrara_17AD, title={plot - R barplot: wrapping long text labels?}, url={https://stackoverflow.com/questions/20241065/r-barplot-wrapping-long-text-labels}, journal={Stack Overflow}, author={jrara}, year={17AD}, month={Nov} }
