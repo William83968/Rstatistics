@@ -65,8 +65,8 @@ wrap.labels <- function(x, len)
 To get an idea of the new data, we will do a quick bargraph of the 'general supply' columns from the excel file.
 (It is with several trial and error, that we have found out the original excel file is not suitable for R data analysis, therefore manual excel operation was done to extract it out into a form which was useful.)
 ```{r eval=TRUE}
-library(readxl)
-library(dplyr)
+require(readxl)
+require(dplyr)
 options(scipen = 999)
 
 # Read in files
@@ -95,11 +95,30 @@ barplot(values2021, names.arg=wrap.labels(rev(suburbs2021), 20),
         col="blue", xlab=" Electricity consumption/MWh", horiz=T, las=2, cex.names = 0.7)
 ```
 ## Reseearch question 1:
-What was the relationship 
+For 'General Supply'
+```{r eval=TRUE}
+lin_reg <- function(l1, l2){
+  data <- data.frame(x=l1, y=l2)
+  model <- lm(y ~ x, data=data)
+  print(summary(model))
+  plot(data$x, data$y, xlab="Customer number", ylab="Electricity consumption/MWh")
+  abline(model)
+}
+# Linear regression for 2019
+lin2019G <- lin_reg(extracted_data$`2019-RP`, values2019)
+# Linear regression for 2021
+lin2021G <- lin_reg(extracted_data$`2021-RP`, values2021)
+```
+For 'Non-residential medium sites'
+```{r eval=TRUE}
+lin2019M <- lin_reg(extracted_data$`2019-MP`, )
+```
 
+During the pandemic in 2020, we observed several lockdowns where people were forced to stay home. Businesses began to shut down and jobs transitioned from offices to working from home. This may have played a major role in the electrical usage from 2019-2020 as usage in commercial areas decreased while residential areas increased.  
+This could've contributed to the effect that 
 
 ## Research question 2:
-During the pandemic, we observed several lockdowns where people were forced to stay home due to businesses shutting down, commercial buildings transitioning to a work from home environment.This meant there was a lot of changes with the distribution of the population, and the impact of this on electricity consumptions.
+How does the electrical consumption vary for different usages such as the general supply, small-medium sites and large sites. To answer this question, bar plots and normal distribution graphs will be used to visualise data. The general supply refers to electricity used for residential purposes. The small-medium sites refer to non-residential customers utilising less than 160MWh per year while large sites use more than 160MWh per year.  
 To get an general idea of which areas had the highest amount of electricity consumption, normal distribution graph was made.
 (We'll use the latest complete dataset, which was the 2021 dataset)
 General Supply
@@ -118,11 +137,15 @@ distribution <- function(title, name, values){
 }
 distribution("Electricity Consumption/MWh", suburbs2021, values2021)
 ```
+In the general supply bar graph, Sydney utilises the highest amount of electricity compared to the other suburbs. This can be explained as it has the highest population density meaning more residents. The normal distribution curve is skewed to the right with the mean consumption being just over 200000 MWh.  
+
 'Non-residential small-medium sites'
 ```{r eval=TRUE}
 values2021M <- extracted_data$`2021-M`
 distribution("Electricity Consumption/MWh",suburbs2021, values2021M)
 ```
+In the small-medium site graph, Sydney is also the highest consuming suburb which is explained by the high number of businesses that operate within the area.  
+
 'Non-residential large sites'
 ```{r eval=TRUE}
 values2021L <- extracted_data$`2021-L`
