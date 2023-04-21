@@ -1,6 +1,6 @@
 ---
 title: "SydneyEnergyResearch"
-subtitle: "Electricity"
+subtitle: "Electricity Consumption of Australian Eastern Coast"
 author: "© University of Sydney 2023"
 date: 30/03/2023
 output:
@@ -94,13 +94,17 @@ suburbs2021 <- extracted_data$H2021
 barplot(values2021, names.arg=wrap.labels(rev(suburbs2021), 20), 
         col="blue", xlab=" Electricity consumption/MWh", horiz=T, las=2, cex.names = 0.7)
 ```
-## Reseearch question 1:
-For 'General Supply'
+## Research question 1:
+
+
+
+### For 'General Supply'
 ```{r eval=TRUE}
 lin_reg <- function(l1, l2){
   data <- data.frame(x=l1, y=l2)
   model <- lm(y ~ x, data=data)
-  print(summary(model))
+  slope <- summary(model)$coefficients[2,1]
+  
   plot(data$x, data$y, xlab="Customer number", ylab="Electricity consumption/MWh")
   abline(model)
 }
@@ -111,11 +115,20 @@ lin2021G <- lin_reg(extracted_data$`2021-RP`, values2021)
 ```
 For 'Non-residential medium sites'
 ```{r eval=TRUE}
-lin2019M <- lin_reg(extracted_data$`2019-MP`, )
+values2019M <- extracted_data$`2019-M`
+lin2019M <- lin_reg(extracted_data$`2019-MP`,values2019M)
+values2021M <- extracted_data$`2021-M`
+lin2021M <- lin_reg(extracted_data$`2021-MP`,values2021M)
 ```
-
-During the pandemic in 2020, we observed several lockdowns where people were forced to stay home. Businesses began to shut down and jobs transitioned from offices to working from home. This may have played a major role in the electrical usage from 2019-2020 as usage in commercial areas decreased while residential areas increased.  
-This could've contributed to the effect that 
+For 'Non-residential large sites'
+```{r eval=TRUE}
+values2019L <- extracted_data$`2019-L`
+lin2019L <- lin_reg(extracted_data$`2019-LP`,values2019L)
+values2021L <- extracted_data$`2021-L`
+lin2021L <- lin_reg(extracted_data$`2021-LP`,values2021L)
+```
+As can see, the linear regression of all three graphs have insignifcant differences.
+One possible reason for this is that during the pandemic in 2020, we observed several lockdowns where people were forced to stay home. Businesses began to shut down and jobs transitioned from offices to working from home. This may have played a major role in the electrical usage from 2019-2020 as usage in commercial areas decreased while residential areas increased.The effects of both of these population movement balanced each other out, and thus the relationship between the population and electricity consumption did not change.
 
 ## Research question 2:
 How does the electrical consumption vary for different usages such as the general supply, small-medium sites and large sites. To answer this question, bar plots and normal distribution graphs will be used to visualise data. The general supply refers to electricity used for residential purposes. The small-medium sites refer to non-residential customers utilising less than 160MWh per year while large sites use more than 160MWh per year.  
@@ -141,14 +154,12 @@ In the general supply bar graph, Sydney utilises the highest amount of electrici
 
 'Non-residential small-medium sites'
 ```{r eval=TRUE}
-values2021M <- extracted_data$`2021-M`
 distribution("Electricity Consumption/MWh",suburbs2021, values2021M)
 ```
 In the small-medium site graph, Sydney is also the highest consuming suburb which is explained by the high number of businesses that operate within the area.  
 
 'Non-residential large sites'
 ```{r eval=TRUE}
-values2021L <- extracted_data$`2021-L`
 distribution("Electricity Consumption/MWh",suburbs2021, values2021L)
 ```
 Finally, to make a conclusion, a pie chart is made
