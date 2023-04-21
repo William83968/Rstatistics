@@ -3,7 +3,6 @@ title: "SydneyEnergyResearch"
 subtitle: "Electricity"
 author: "© University of Sydney 2023"
 date: 30/03/2023
-
 output:
   html_document:
     fig_caption: yes
@@ -95,26 +94,12 @@ suburbs2021 <- extracted_data$H2021
 barplot(values2021, names.arg=wrap.labels(rev(suburbs2021), 20), 
         col="blue", xlab=" Electricity consumption/MWh", horiz=T, las=2, cex.names = 0.7)
 ```
+## Reseearch question 1:
+What was the relationship 
 
-## Research question 1:
-The impact of the covid-19 pandemic on electricity consumption in the different suburbs of Sydney
-As covid-19 strikes Australia, our reliance on digital equipments especially remote streaming apps has increased drastically.So, the hypothesis is the usage of digital equipments has led to a increase in electricity consumption.
-Is there an electricity usage rise during the pandemic?
-
-From the IDA, it seems like the data itself is not distinctive enough to be able figure out the difference from first site.
-
-```{r eval=TRUE}
-sdev1 = mean(values2019)
-sdev2 = mean(values2020)
-sdev3 = mean(values2021)
-ts = c(sdev1, sdev2, sdev3)
-barplot(ts, names.arg=c('2019', '2020', '2021'))
-```
-It seems like the hypothesis has been falsified, there was a slight electric usage increase, but not during pandemic, instead it was after the pandemic in 2021
-However, it is also considered that as some values from the 2022-2023 dataset is missing, part of this could also contributed to this phenomenon.
 
 ## Research question 2:
-As there was a lot of changes to the distribution of population before and after the pandemic, the impact of the change was investigated.
+During the pandemic, we observed several lockdowns where people were forced to stay home due to businesses shutting down, commercial buildings transitioning to a work from home environment.This meant there was a lot of changes with the distribution of the population, and the impact of this on electricity consumptions.
 To get an general idea of which areas had the highest amount of electricity consumption, normal distribution graph was made.
 (We'll use the latest complete dataset, which was the 2021 dataset)
 General Supply
@@ -155,8 +140,9 @@ pie(pie_values, labels = pie_labels)
 ```
 As can see, this shows a nuanced side of the distribution of electricity consumption by Ausgrid, as Ausgrid is the largest distributor of electricity on the east coast, there's a high chance that this represents the total electricity consumption of NSW.
 If we're talking about large areas like shopping malls, business skyscrapers or tourist attractions, than population does matter, in fact a lot, so places where there tends to be large flow of population, like Sydney(The normal distribution graph shows how skewed this situation is), actually uses the most amount electrcity.
-However, if we're talking about residential supplies, which corresponds to the 'General Supply' column of the data source.Than population matters less, because with residential usage, the amount of electricty consumption depends on the size of the housing, which is why I guess Central Coast has the most amount of electricty
-(Note: Again, just to be cautious, it is considered that Ausgrid could've have a target customer base, which could explain part of this situation as well)
+However, if we're talking about residential supplies, which corresponds to the 'General Supply' column of the data source.Than population matters less, because with residential usage, the amount of electricity consumption depends on the size of the housing, which is why I guess Central Coast has the most amount of electricity
+(Note: Again, just to be cautious, it is considered that Ausgrid could've had a target customer base, which could explain part of this situation as well)
 
 ## References
-@misc{jrara_17AD, title={plot - R barplot: wrapping long text labels?}, url={https://stackoverflow.com/questions/20241065/r-barplot-wrapping-long-text-labels}, journal={Stack Overflow}, author={jrara}, year={17AD}, month={Nov} }
+jrara. (17 C.E., November). plot - R barplot: wrapping long text labels? Stack Overflow. https://stackoverflow.com/questions/20241065/r-barplot-wrapping-long-text-labels
+
